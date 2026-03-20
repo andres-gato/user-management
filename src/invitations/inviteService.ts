@@ -29,6 +29,19 @@ const REFERRAL_CODE_KEY = 'um_referral_code';
 
 const DEFAULT_REF_QUERY_PARAM = 'ref';
 
+export function removeReferralQueryParamFromCurrentUrl(
+  queryParam = DEFAULT_REF_QUERY_PARAM,
+) {
+  if (typeof window === 'undefined') return;
+
+  const url = new URL(window.location.href);
+  if (!url.searchParams.has(queryParam)) return;
+
+  url.searchParams.delete(queryParam);
+  const nextPath = `${url.pathname}${url.search}${url.hash}`;
+  window.history.replaceState({}, '', nextPath);
+}
+
 function buildInviteUrl(code: string, baseUrl: string): string {
   const url = new URL(baseUrl);
   url.searchParams.set(DEFAULT_REF_QUERY_PARAM, code);
@@ -40,6 +53,11 @@ function getBaseUrlForLinks(): string {
   return typeof window !== 'undefined'
     ? window.location.href
     : 'http://localhost/';
+}
+
+export function getInviteUrlFromCode(code: string, baseUrl?: string): string {
+  const sourceUrl = baseUrl ?? getBaseUrlForLinks();
+  return buildInviteUrl(code, sourceUrl);
 }
 
 export function captureReferralFromUrl(
@@ -82,7 +100,7 @@ export function createInvite(input: { inviterId: string; baseUrl?: string }): {
   writeJsonArray(INVITES_KEY, invites);
 
   const baseUrl = input.baseUrl ?? getBaseUrlForLinks();
-  const inviteUrl = buildInviteUrl(code, baseUrl);
+  const inviteUrl = getInviteUrlFromCode(code, baseUrl);
   return { inviteCode: code, inviteUrl };
 }
 
@@ -108,6 +126,7 @@ export function attributeConversionFromStoredReferralCode(params: {
 }): Conversion | null {
   const storedCode = consumeStoredReferralCode();
   if (!storedCode) return null;
+  removeReferralQueryParamFromCurrentUrl();
 
   const invites = readJsonArray<Invite>(INVITES_KEY);
   const invite = invites.find((i) => i.code === storedCode);

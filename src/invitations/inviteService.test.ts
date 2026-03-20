@@ -6,10 +6,20 @@ import {
   getConversionStatsForReferrer,
   getConversionsForReferrer,
   getInvitesForInviter,
+  removeReferralQueryParamFromCurrentUrl,
 } from './inviteService';
 import { signUp } from '../auth/authService';
 
 describe('inviteService', () => {
+  test('removeReferralQueryParamFromCurrentUrl removes only ref param', () => {
+    window.history.replaceState({}, '', '/welcome?ref=abc123&tab=home#section');
+
+    removeReferralQueryParamFromCurrentUrl();
+
+    expect(window.location.search).toBe('?tab=home');
+    expect(window.location.hash).toBe('#section');
+  });
+
   test('createInvite builds a unique URL with the referral code', () => {
     localStorage.clear();
 
@@ -55,6 +65,7 @@ describe('inviteService', () => {
 
   test('signUp attributes conversion using the stored referral code', async () => {
     localStorage.clear();
+    window.history.replaceState({}, '', '/signup?ref=pending_code&step=1');
 
     const { inviteCode } = createInvite({
       inviterId: 'inviter_2',
@@ -71,6 +82,7 @@ describe('inviteService', () => {
     const conversions = getConversionsForReferrer('inviter_2');
     expect(conversions).toHaveLength(1);
     expect(conversions[0]?.referredUserId).toBe(friend.id);
+    expect(window.location.search).toBe('?step=1');
   });
 
   test('getConversionStatsForReferrer returns the correct conversion rate', async () => {
