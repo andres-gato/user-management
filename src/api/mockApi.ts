@@ -1,3 +1,6 @@
+import { randomId } from '../utils/id';
+import { readJsonArray, writeJsonArray } from '../utils/storage';
+
 export type DbUser = {
   id: string;
   email: string;
@@ -12,28 +15,6 @@ export type PublicUser = {
 const USERS_KEY = 'um_users';
 const SESSION_KEY = 'um_session_userId';
 
-function getCryptoId(): string {
-  const anyCrypto = globalThis.crypto as
-    | undefined
-    | { randomUUID?: () => string };
-  if (anyCrypto?.randomUUID) return anyCrypto.randomUUID();
-  return `u_${Math.random().toString(16).slice(2)}_${Date.now()}`;
-}
-
-function readUsers(): DbUser[] {
-  const raw = localStorage.getItem(USERS_KEY);
-  if (!raw) return [];
-  try {
-    return JSON.parse(raw) as DbUser[];
-  } catch {
-    return [];
-  }
-}
-
-function writeUsers(users: DbUser[]) {
-  localStorage.setItem(USERS_KEY, JSON.stringify(users));
-}
-
 export async function createUser(input: {
   email: string;
   password: string;
@@ -41,20 +22,20 @@ export async function createUser(input: {
   const email = input.email.trim().toLowerCase();
   const password = input.password;
 
-  const users = readUsers();
+  const users = readJsonArray<DbUser>(USERS_KEY);
   const existing = users.find((u) => u.email === email);
   if (existing) {
     throw new Error('EMAIL_TAKEN');
   }
 
   const user: DbUser = {
-    id: getCryptoId(),
+    id: randomId('u'),
     email,
     password,
   };
 
   users.push(user);
-  writeUsers(users);
+  writeJsonArray(USERS_KEY, users);
 
   return { id: user.id, email: user.email };
 }
@@ -66,7 +47,7 @@ export async function authenticate(input: {
   const email = input.email.trim().toLowerCase();
   const password = input.password;
 
-  const users = readUsers();
+  const users = readJsonArray<DbUser>(USERS_KEY);
   const user = users.find((u) => u.email === email);
   if (!user || user.password !== password) {
     throw new Error('INVALID_CREDENTIALS');
@@ -88,7 +69,7 @@ export function getSessionUserId(): string | null {
 }
 
 export function getPublicUserById(userId: string): PublicUser | null {
-  const users = readUsers();
+  const users = readJsonArray<DbUser>(USERS_KEY);
   const user = users.find((u) => u.id === userId);
   return user ? { id: user.id, email: user.email } : null;
 }

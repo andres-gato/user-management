@@ -3,6 +3,7 @@ import type { PublicUser } from '../../api/mockApi';
 import { getCurrentUser, signOut } from '../authService';
 import { SignInForm } from './SignInForm';
 import { SignUpForm } from './SignUpForm';
+import { FriendInvites } from '../../invitations/ui/FriendInvites';
 
 type Mode = 'signin' | 'signup';
 
@@ -33,6 +34,8 @@ export function AuthPanel() {
           >
             Sign out
           </button>
+
+          <FriendInvites inviter={currentUser} />
         </div>
       ) : (
         <div className="space-y-6">

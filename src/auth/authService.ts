@@ -7,6 +7,7 @@ import {
   getSessionUserId,
   setSessionUserId,
 } from '../api/mockApi';
+import { attributeConversionFromStoredReferralCode } from '../invitations/inviteService';
 
 export type SignUpInput = { email: string; password: string };
 export type SignInInput = { email: string; password: string };
@@ -34,6 +35,8 @@ function toAuthError(code: string) {
 export async function signUp(input: SignUpInput): Promise<PublicUser> {
   try {
     const user = await createUser(input);
+    // If the user arrived from an invite URL, attribute this conversion now.
+    attributeConversionFromStoredReferralCode({ referredUserId: user.id });
     setSessionUserId(user.id);
     return user;
   } catch (err) {
