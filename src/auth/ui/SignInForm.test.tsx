@@ -10,7 +10,12 @@ describe('SignInForm', () => {
   });
 
   test('sign in fails with wrong password', async () => {
-    await signUp({ email: 'a@example.com', password: 'secret' });
+    await signUp({
+      firstName: 'A',
+      lastName: 'One',
+      email: 'a@example.com',
+      password: 'secret',
+    });
 
     const onSignedIn = vi.fn();
     const user = userEvent.setup();

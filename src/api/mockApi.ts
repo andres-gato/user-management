@@ -3,12 +3,16 @@ import { readJsonArray, writeJsonArray } from '../utils/storage';
 
 export type DbUser = {
   id: string;
+  firstName: string;
+  lastName: string;
   email: string;
   password: string; // Mock only; do not store plaintext passwords in real apps.
 };
 
 export type PublicUser = {
   id: string;
+  firstName: string;
+  lastName: string;
   email: string;
 };
 
@@ -16,9 +20,13 @@ const USERS_KEY = 'um_users';
 const SESSION_KEY = 'um_session_userId';
 
 export async function createUser(input: {
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
 }): Promise<PublicUser> {
+  const firstName = input.firstName.trim();
+  const lastName = input.lastName.trim();
   const email = input.email.trim().toLowerCase();
   const password = input.password;
 
@@ -30,6 +38,8 @@ export async function createUser(input: {
 
   const user: DbUser = {
     id: randomId('u'),
+    firstName,
+    lastName,
     email,
     password,
   };
@@ -37,7 +47,12 @@ export async function createUser(input: {
   users.push(user);
   writeJsonArray(USERS_KEY, users);
 
-  return { id: user.id, email: user.email };
+  return {
+    id: user.id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+  };
 }
 
 export async function authenticate(input: {
@@ -53,7 +68,12 @@ export async function authenticate(input: {
     throw new Error('INVALID_CREDENTIALS');
   }
 
-  return { id: user.id, email: user.email };
+  return {
+    id: user.id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+  };
 }
 
 export function setSessionUserId(userId: string) {
@@ -71,5 +91,12 @@ export function getSessionUserId(): string | null {
 export function getPublicUserById(userId: string): PublicUser | null {
   const users = readJsonArray<DbUser>(USERS_KEY);
   const user = users.find((u) => u.id === userId);
-  return user ? { id: user.id, email: user.email } : null;
+  return user
+    ? {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+      }
+    : null;
 }

@@ -9,7 +9,12 @@ import {
 } from '../api/mockApi';
 import { attributeConversionFromStoredReferralCode } from '../invitations/inviteService';
 
-export type SignUpInput = { email: string; password: string };
+export type SignUpInput = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+};
 export type SignInInput = { email: string; password: string };
 
 export class AuthError extends Error {

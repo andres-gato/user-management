@@ -20,7 +20,8 @@ export function AuthPanel() {
           <div className="text-sm text-zinc-600">
             Signed in as{' '}
             <span className="font-medium text-zinc-900">
-              {currentUser.email}
+              {currentUser.firstName} {currentUser.lastName} (
+              {currentUser.email})
             </span>
           </div>
           <button

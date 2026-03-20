@@ -4,6 +4,8 @@ import type { PublicUser } from '../../api/mockApi';
 import { AuthError, signUp } from '../authService';
 
 export function SignUpForm(props: { onSignedUp: (user: PublicUser) => void }) {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -13,14 +15,14 @@ export function SignUpForm(props: { onSignedUp: (user: PublicUser) => void }) {
     e.preventDefault();
     setError(null);
 
-    if (!email.trim() || !password) {
-      setError('Email and password are required');
+    if (!firstName.trim() || !lastName.trim() || !email.trim() || !password) {
+      setError('First name, last name, email, and password are required');
       return;
     }
 
     setIsSubmitting(true);
     try {
-      const user = await signUp({ email, password });
+      const user = await signUp({ firstName, lastName, email, password });
       props.onSignedUp(user);
     } catch (err) {
       if (err instanceof AuthError) {
@@ -37,6 +39,41 @@ export function SignUpForm(props: { onSignedUp: (user: PublicUser) => void }) {
 
   return (
     <form onSubmit={onSubmit} className="space-y-4" aria-label="Sign up">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div>
+          <label
+            className="block text-sm font-medium text-zinc-700"
+            htmlFor="signup-first-name"
+          >
+            First name
+          </label>
+          <input
+            id="signup-first-name"
+            data-testid="signup-first-name-input"
+            className="mt-1 w-full rounded border border-zinc-300 bg-white p-2 text-zinc-900"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            autoComplete="given-name"
+          />
+        </div>
+        <div>
+          <label
+            className="block text-sm font-medium text-zinc-700"
+            htmlFor="signup-last-name"
+          >
+            Last name
+          </label>
+          <input
+            id="signup-last-name"
+            data-testid="signup-last-name-input"
+            className="mt-1 w-full rounded border border-zinc-300 bg-white p-2 text-zinc-900"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            autoComplete="family-name"
+          />
+        </div>
+      </div>
+
       <div>
         <label
           className="block text-sm font-medium text-zinc-700"

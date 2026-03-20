@@ -75,6 +75,8 @@ describe('inviteService', () => {
     captureReferralFromUrl(`http://localhost/accept?ref=${inviteCode}`);
 
     const friend = await signUp({
+      firstName: 'Friend',
+      lastName: 'One',
       email: 'friend@example.com',
       password: 'secret',
     });
@@ -99,6 +101,8 @@ describe('inviteService', () => {
 
     captureReferralFromUrl(`http://localhost/accept?ref=${c1}`);
     const friend = await signUp({
+      firstName: 'Friend',
+      lastName: 'Three',
       email: 'friend3@example.com',
       password: 'secret',
     });
