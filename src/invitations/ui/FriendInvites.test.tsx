@@ -10,7 +10,12 @@ describe('FriendInvites', () => {
   });
 
   test('creates an invite link and displays it', async () => {
-    const inviter: PublicUser = { id: 'inviter_ui_1', email: 'me@example.com' };
+    const inviter: PublicUser = {
+      id: 'inviter_ui_1',
+      email: 'me@example.com',
+      firstName: 'John',
+      lastName: 'Doe',
+    };
     const user = userEvent.setup();
 
     render(<FriendInvites inviter={inviter} />);
@@ -26,6 +31,8 @@ describe('FriendInvites', () => {
     const inviter: PublicUser = {
       id: 'inviter_ui_2',
       email: 'me2@example.com',
+      firstName: 'John',
+      lastName: 'Doe',
     };
     const user = userEvent.setup();
 
@@ -46,6 +53,8 @@ describe('FriendInvites', () => {
     const inviter: PublicUser = {
       id: 'inviter_ui_3',
       email: 'me3@example.com',
+      firstName: 'Jane',
+      lastName: 'Doe',
     };
     const user = userEvent.setup();
 
